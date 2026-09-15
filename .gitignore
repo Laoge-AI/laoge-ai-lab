@@ -1,0 +1,6 @@
+website/dist/
+website/node_modules/
+website/.wrangler/
+website/.env
+website/.env.*
+website/artifacts/

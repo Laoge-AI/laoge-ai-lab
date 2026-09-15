@@ -1,0 +1,76 @@
+import assert from 'node:assert/strict';
+import { readFile, readdir, stat } from 'node:fs/promises';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { spawn } from 'node:child_process';
+import { once } from 'node:events';
+
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const dist = join(root, 'dist');
+async function walk(dir) {
+  const entries = await readdir(dir, { withFileTypes: true });
+  return (await Promise.all(entries.map(entry => entry.isDirectory() ? walk(join(dir, entry.name)) : join(dir, entry.name)))).flat();
+}
+const files = await walk(dist);
+const pages = files.filter(file => file.endsWith('.html'));
+const pageMap = new Map(await Promise.all(pages.map(async file => [file, await readFile(file, 'utf8')])));
+for (const [file, html] of pageMap) {
+  assert.match(html, /<html lang="zh-CN"/);
+  assert.equal([...html.matchAll(/<h1(?:\s[^>]*)?>/g)].length, 1, `${file}: exactly one h1`);
+  assert.match(html, /<meta name="description" content="[^"]+"/);
+  assert.doesNotMatch(html, /undefined|\[object Object\]|href="#"/);
+  const ids = [...html.matchAll(/\bid="([^"]+)"/g)].map(match => match[1]);
+  assert.equal(new Set(ids).size, ids.length, `${file}: duplicate IDs`);
+  const schemas = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
+  for (const match of schemas) assert.equal(JSON.parse(match[1])['@context'], 'https://schema.org');
+  for (const match of html.matchAll(/<(?:a|link|script|img)\b[^>]*?\b(?:href|src)="([^"]+)"/g)) {
+    const target = match[1];
+    if (/^(?:https?:|mailto:|data:)/.test(target)) continue;
+    const [path, anchor] = target.split('#');
+    let asset = path ? resolve(dist, `.${path}`) : file;
+    if ((await stat(asset)).isDirectory()) asset = join(asset, 'index.html');
+    await stat(asset);
+    if (anchor) assert.match(await readFile(asset, 'utf8'), new RegExp(`id="${anchor}"`), `${file}: missing anchor ${target}`);
+  }
+  for (const match of html.matchAll(/<img\b[^>]*>/g)) assert.match(match[0], /\balt="[^"]*"/);
+}
+const robots = await readFile(join(dist, 'robots.txt'), 'utf8');
+if (robots.includes('Sitemap:')) {
+  const sitemap = await readFile(join(dist, 'sitemap.xml'), 'utf8');
+  assert.equal([...sitemap.matchAll(/<loc>/g)].length, 3);
+  for (const [file, html] of pageMap) {
+    if (!file.endsWith('404.html')) {
+      assert.match(html, /rel="canonical" href="https:\/\//);
+      assert.match(html, /content="index, follow"/);
+    }
+  }
+} else {
+  for (const html of pageMap.values()) assert.match(html, /content="noindex, nofollow"/);
+}
+console.log(`Static check passed: ${pages.length} pages, local links, anchors, assets, metadata and schema.`);
+
+// Smoke test actual HTTP routes so missing pages do not silently fall back to the homepage.
+const server = spawn(process.execPath, ['scripts/preview.mjs'], { cwd: root, env: { ...process.env, PORT: '0' }, stdio: ['ignore', 'pipe', 'pipe'] });
+try {
+  const base = await new Promise((resolveReady, reject) => {
+    const timer = setTimeout(() => reject(new Error('Preview server timed out')), 10000);
+    server.stdout.on('data', data => {
+      const found = data.toString().match(/http:\/\/127\.0\.0\.1:\d+/);
+      if (found) { clearTimeout(timer); resolveReady(found[0]); }
+    });
+    server.on('error', error => { clearTimeout(timer); reject(error); });
+    server.on('exit', code => { clearTimeout(timer); reject(new Error(`Preview exited: ${code}`)); });
+  });
+  for (const path of ['/', '/experiments/ai-customer-service/', '/experiments/ai-website/', '/assets/styles.css', '/assets/site.js', '/robots.txt', '/llms.txt', '/images/customer-service-test.png']) {
+    const response = await fetch(base + path);
+    assert.equal(response.status, 200, path);
+  }
+  const missing = await fetch(`${base}/does-not-exist/`);
+  assert.equal(missing.status, 404);
+  assert.match(await missing.text(), /这条路还没铺好/);
+  console.log('HTTP check passed: pages, assets and custom 404.');
+} finally {
+  const stopped = once(server, 'exit');
+  server.kill();
+  await stopped;
+}
