@@ -63,9 +63,11 @@ Windows默认使用系统Edge，其他环境使用Playwright Chromium（必要�
 
 更换视频时需要重新核对录屏内容、裁剪范围、实际时长和文字说明。原始文件保持在用户本地，操作记录见 `DEMO-NOTES.md`。
 
-本地预览服务器提供MP4类型及HTTP字节范围请求支持，便于真实测试播放和拖动进度；生产环境由Cloudflare Pages提供静态媒体响应。
+本地预览服务器提供MP4类型及HTTP字节范围请求支持。实际部署时发现Pages资产端点会忽略视频Range请求，因此 `functions/media/[[path]].js` 为视频补充206、HEAD及416响应。`public/_routes.json` 仅将 `/media/*` 交给此函数；页面、样式和图片继续使用静态服务。无需配置第三方账号或存储，视频来自本次Pages部署的ASSETS绑定。
 
 浏览器测试包含实际开始播放、暂停、跳转到40秒，以及查看文字流程。静态检查同时核对媒体MIME、HEAD和字节范围响应。
+
+运行 `npm run test:media` 可验证Pages视频函数返回的实际文件字节、开放区间、后缀区间及错误处理。此函数当前针对约1 MiB的小录屏，若未来改为大视频，应重新评估媒体托管方式。
 
 ## Cloudflare Pages：静态站部署
 

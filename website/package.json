@@ -11,7 +11,8 @@
     "build:preview": "node scripts/build.mjs --preview",
     "preview": "node scripts/preview.mjs",
     "check": "node scripts/check.mjs",
-    "test:browser": "playwright test"
+    "test:browser": "playwright test",
+    "test:media": "node --test tests/pages-media.test.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.63.0"
