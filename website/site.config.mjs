@@ -5,7 +5,7 @@ export default {
   tagline: '有8年IT项目交付经验，记录AI参与真实业务任务的过程、结果与踩坑。',
   city: '陕西 · 西安',
   // 已确认的正式地址；以后绑定自有域名时可用 SITE_URL 环境变量覆盖。
-  url: process.env.SITE_URL || 'https://laoge-ai-lab.laoge-lab.workers.dev',
+  url: process.env.SITE_URL || 'https://laoge-ai-lab.pages.dev',
   contact: {
     wechat: '',
     // 图片放在 public/ 下，例如 /images/wechat-qr.png。

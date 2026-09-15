@@ -50,25 +50,29 @@ Windows默认使用系统Edge，其他环境使用Playwright Chromium（必要�
 
 不需要上传原始账号资料目录或 `deliverables`。`scripts/import-assets.mjs` 是本地一次性导入工具，部署时不运行，也不依赖原始电脑路径。
 
-## Cloudflare Workers：静态站部署
+## Cloudflare Pages：静态站部署
 
 公开仓库：<https://github.com/Laoge-AI/laoge-ai-lab>。
 
-正式网站：<https://laoge-ai-lab.laoge-lab.workers.dev/>。
+正式网站：<https://laoge-ai-lab.pages.dev/>。
 
-用户在Cloudflare网页创建的是Workers静态资源站点，首页和案例已可公开访问。维护现有 `laoge-ai-lab` Worker，无需为这次域名修改另建项目。
+首次部署在Workers上，后来发现部分目标用户无法直连。对照测试中，旧Pages站点可以直连，随后将同一份代码部署到 `laoge-ai-lab` Pages项目，用户反馈可正常打开。本次选择Pages作为正式分享入口；这不代表所有地区和运营商都已验证。
 
 - 生产分支：`main`。
 - 根目录：`website`。
 - 构建命令：`npm run build`。
-- 发布的静态资源：`dist`。
+- 构建输出目录：`dist`。
 - Node版本：22（可设置 `NODE_VERSION=22`）。
 
 正式地址已写在 `site.config.mjs`，可用 `SITE_URL` 环境变量覆盖。生产构建会输出canonical、sitemap、允许索引的robots及带正式地址的结构化数据。
 
+Pages初次对照测试使用 `npm run build:preview`。转为正式入口时，在Pages项目的构建设置中将命令改为 `npm run build`，保存后通过Git推送触发新部署。如果配置过 `SITE_URL`，应更新为上述Pages地址。
+
 本地或远程预览使用 `npm run build:preview`，或设置构建变量 `SITE_PREVIEW=1`。预览构建禁止索引，并移除上一次生产构建的网站地图；不要在生产构建中开启该变量。
 
-如果以后绑定自有域名，先在现有Worker添加并验证域名，再更新 `SITE_URL` 并重新部署。Git推送后应查看Cloudflare构建结果，并检查公网内容是否已经更新。
+如果以后绑定自有域名，先在Pages项目的自定义域名设置中添加并验证域名，再更新 `SITE_URL` 并重新部署。Git推送后应查看Cloudflare Pages构建结果，并检查公网内容是否已经更新。
+
+同一仓库仍可能触发原Workers部署。默认canonical统一指向Pages正式地址，不将Workers地址继续作为主要分享入口。
 
 ### SEO与AI检索可读性
 

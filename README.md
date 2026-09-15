@@ -4,7 +4,7 @@
 
 这是老鸽的个人案例网站源码。面向小微企业和需要AI流程改造的业务负责人，展示已经完成的个人实验，以及实际验证的范围。
 
-**网站：<https://laoge-ai-lab.laoge-lab.workers.dev/>**
+**网站：<https://laoge-ai-lab.pages.dev/>**
 
 ## 网站内容
 
@@ -26,19 +26,19 @@ npm run preview
 
 打开 `http://127.0.0.1:4173`。
 
-## Cloudflare Workers静态站部署
+## Cloudflare Pages静态站部署
 
 | 配置 | 值 |
 | --- | --- |
 | 生产分支 | `main` |
 | 根目录 | `website` |
 | 构建命令 | `npm run build` |
-| 静态资源目录 | `dist` |
+| 构建输出目录 | `dist` |
 | Node版本 | `22` |
 
 `npm run build` 默认使用已确认的正式地址，生成canonical、robots和sitemap，允许搜索索引。预览使用 `npm run build:preview` 或设置 `SITE_PREVIEW=1`，不生成网站地图并禁止索引。
 
-以后换域名时可通过 `SITE_URL` 覆盖正式地址，再重新构建、部署。Cloudflare上的部署目标是现有 `laoge-ai-lab` Worker。
+以后换域名时可通过 `SITE_URL` 覆盖正式地址，再重新构建、部署。当前正式部署目标是 `laoge-ai-lab` Pages项目。
 
 ## 维护说明
 

@@ -4,10 +4,10 @@
 
 - 公开仓库：<https://github.com/Laoge-AI/laoge-ai-lab>。
 - 初始代码已提交推送，首次提交为 `dabb08a`。
-- Cloudflare实际创建的是Workers静态站，Worker名称为 `laoge-ai-lab`。
-- 用户已将账号级子域名改为 `laoge-lab`。
-- 正式网站：<https://laoge-ai-lab.laoge-lab.workers.dev/>。
-- 新域名下的首页与两个案例已经可以访问。
+- 首次部署为Workers静态站，随后根据目标用户访问反馈新建了Pages项目。
+- Pages项目名称为 `laoge-ai-lab`，已连接同一GitHub仓库。
+- 正式网站：<https://laoge-ai-lab.pages.dev/>。
+- 用户反馈Pages地址可正常打开；当前执行环境关闭代理直连也返回HTTP 200。
 - 头像、公众号二维码及案例图片都在项目内，构建不依赖原电脑素材路径。
 
 ## 当前部署约定
@@ -18,11 +18,13 @@
 | 生产分支 | `main` |
 | 根目录 | `website` |
 | 构建命令 | `npm run build` |
-| 静态资源目录 | `dist` |
+| 构建输出目录 | `dist` |
 | Node版本 | `22` |
-| 正式URL | `https://laoge-ai-lab.laoge-lab.workers.dev` |
+| 正式URL | `https://laoge-ai-lab.pages.dev` |
 
-沿用已成功发布的Workers部署设置。此前规划的Pages配置不作为当前Worker的部署配置。
+Pages最初用 `npm run build:preview` 做访问对照。用户已确认在项目设置中将命令改为 `npm run build` 并保存。如果配置过 `SITE_URL`，应使用Pages地址；生产构建不要设置 `SITE_PREVIEW=1`。
+
+当前正式目标为Pages项目。原Workers可以保留作历史部署，其存在不代表目标用户能直连。
 
 ## 正式网址与SEO
 
@@ -40,10 +42,10 @@
 
 ## 推送后的核验入口
 
-- 首页：<https://laoge-ai-lab.laoge-lab.workers.dev/>
-- AI客服：<https://laoge-ai-lab.laoge-lab.workers.dev/experiments/ai-customer-service/>
-- AI建站：<https://laoge-ai-lab.laoge-lab.workers.dev/experiments/ai-website/>
-- 抓取规则：<https://laoge-ai-lab.laoge-lab.workers.dev/robots.txt>
-- 网站地图：<https://laoge-ai-lab.laoge-lab.workers.dev/sitemap.xml>
+- 首页：<https://laoge-ai-lab.pages.dev/>
+- AI客服：<https://laoge-ai-lab.pages.dev/experiments/ai-customer-service/>
+- AI建站：<https://laoge-ai-lab.pages.dev/experiments/ai-website/>
+- 抓取规则：<https://laoge-ai-lab.pages.dev/robots.txt>
+- 网站地图：<https://laoge-ai-lab.pages.dev/sitemap.xml>
 
 本地构建通过与Git推送成功不等于远程构建完成；以Cloudflare构建结果和公网响应为准。允许索引也不等于搜索引擎已经收录。
