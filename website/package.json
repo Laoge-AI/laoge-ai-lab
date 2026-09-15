@@ -8,6 +8,7 @@
   },
   "scripts": {
     "build": "node scripts/build.mjs",
+    "build:preview": "node scripts/build.mjs --preview",
     "preview": "node scripts/preview.mjs",
     "check": "node scripts/check.mjs",
     "test:browser": "playwright test"

@@ -4,8 +4,8 @@ export default {
   author: '老鸽',
   tagline: '有8年IT项目交付经验，记录AI参与真实业务任务的过程、结果与踩坑。',
   city: '陕西 · 西安',
-  // 部署后填写正式 https 地址，或通过 Cloudflare 的 SITE_URL 环境变量设置。
-  url: process.env.SITE_URL || '',
+  // 已确认的正式地址；以后绑定自有域名时可用 SITE_URL 环境变量覆盖。
+  url: process.env.SITE_URL || 'https://laoge-ai-lab.laoge-lab.workers.dev',
   contact: {
     wechat: '',
     // 图片放在 public/ 下，例如 /images/wechat-qr.png。

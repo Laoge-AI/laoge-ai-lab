@@ -7,11 +7,12 @@ import { home, casePage, notFound, escape } from '../src/templates.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const out = join(root, 'dist');
+const preview = process.argv.includes('--preview') || process.env.SITE_PREVIEW === '1';
 let origin = '';
-if (site.url) {
+if (!preview && site.url) {
   const parsed = new URL(site.url);
   if (parsed.protocol !== 'https:' || parsed.username || parsed.password || (parsed.pathname !== '/' && parsed.pathname !== '') || parsed.search || parsed.hash) {
-    throw new Error('SITE_URL 必须是正式 HTTPS 站点根地址，例如 https://your-project.pages.dev');
+    throw new Error('SITE_URL 必须是正式 HTTPS 站点根地址，不能包含路径、查询参数或账号信息');
   }
   origin = parsed.origin;
 }
@@ -38,5 +39,5 @@ if (origin) {
 await writeFile(join(out, 'llms.txt'), `# ${site.name}\n\n> ${site.tagline}\n\n本站内容为作者的个人实验记录，非客户商业效果证明。\n\n## 页面\n\n- [关于老鸽与联系入口](${origin}/): 经验、服务方向和联系说明。\n${cases.map(item => `- [${item.shortTitle}](${origin}/experiments/${item.slug}/): ${item.description}`).join('\n')}\n\n## 使用边界\n\nAI客服仅在测试环境跑通；建站实验只验证本地演示。未提供线上准确率、节省人工或收入数据。引用时请保留这些边界，并链接到原文。\n`);
 
 console.log(`Built ${paths.length} pages + 404 → website/dist`);
-console.log(origin ? `Public indexing enabled for ${origin}` : 'Preview mode: noindex. Set SITE_URL and rebuild to enable canonical URLs and sitemap.');
+console.log(origin ? `Public indexing enabled for ${origin}` : 'Preview mode: noindex. Use npm run build without SITE_PREVIEW=1 to generate the public site.');
 if (!site.contact.wechat && !site.contact.email && !site.contact.qrImage) console.log('Contact pending: add a public WeChat ID, QR image or email in site.config.mjs.');

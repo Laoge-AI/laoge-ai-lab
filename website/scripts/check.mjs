@@ -1,9 +1,10 @@
 import assert from 'node:assert/strict';
 import { readFile, readdir, stat } from 'node:fs/promises';
-import { dirname, join, resolve } from 'node:path';
+import { dirname, join, relative, resolve, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import { once } from 'node:events';
+import site from '../site.config.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = join(root, 'dist');
@@ -36,16 +37,31 @@ for (const [file, html] of pageMap) {
 }
 const robots = await readFile(join(dist, 'robots.txt'), 'utf8');
 if (robots.includes('Sitemap:')) {
+  const origin = new URL(site.url).origin;
+  assert.ok(robots.includes(`Sitemap: ${origin}/sitemap.xml`));
   const sitemap = await readFile(join(dist, 'sitemap.xml'), 'utf8');
   assert.equal([...sitemap.matchAll(/<loc>/g)].length, 3);
+  const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(match => match[1]);
+  const expectedLocations = [];
   for (const [file, html] of pageMap) {
     if (!file.endsWith('404.html')) {
-      assert.match(html, /rel="canonical" href="https:\/\//);
+      const path = '/' + relative(dist, file).split(sep).join('/').replace(/index\.html$/, '');
+      const expected = origin + path;
+      expectedLocations.push(expected);
+      assert.ok(html.includes(`rel="canonical" href="${expected}"`), `${file}: wrong canonical URL`);
+      assert.ok(html.includes(`property="og:url" content="${expected}"`), `${file}: wrong social URL`);
       assert.match(html, /content="index, follow"/);
+      const data = JSON.parse(html.match(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/)[1]);
+      assert.ok(data['@graph'].some(entry => entry.url === expected && ['Article', 'WebSite'].includes(entry['@type'])), `${file}: missing structured page URL`);
     }
   }
+  assert.deepEqual(locations.sort(), expectedLocations.sort());
 } else {
-  for (const html of pageMap.values()) assert.match(html, /content="noindex, nofollow"/);
+  assert.ok(!files.includes(join(dist, 'sitemap.xml')), 'Preview build must remove stale production sitemap');
+  for (const html of pageMap.values()) {
+    assert.match(html, /content="noindex, nofollow"/);
+    assert.doesNotMatch(html, /rel="canonical"/);
+  }
 }
 console.log(`Static check passed: ${pages.length} pages, local links, anchors, assets, metadata and schema.`);
 

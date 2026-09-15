@@ -7,7 +7,7 @@
 需要 Node.js 22 或更新版本，在 `website` 目录运行：
 
 ```sh
-npm run build
+npm run build:preview
 npm run check
 npm run preview
 ```
@@ -50,24 +50,25 @@ Windows默认使用系统Edge，其他环境使用Playwright Chromium（必要�
 
 不需要上传原始账号资料目录或 `deliverables`。`scripts/import-assets.mjs` 是本地一次性导入工具，部署时不运行，也不依赖原始电脑路径。
 
-## Cloudflare Pages：Git部署
+## Cloudflare Workers：静态站部署
 
-公开仓库已创建：<https://github.com/Laoge-AI/laoge-ai-lab>。GitHub账号已授权；Cloudflare Pages的Git连接仍需在账号页面完成。
+公开仓库：<https://github.com/Laoge-AI/laoge-ai-lab>。
 
-1. 使用公开仓库 `Laoge-AI/laoge-ai-lab`，网站代码和公开素材统一由Git管理。
-2. 在Cloudflare中进入 Workers & Pages，创建Pages项目并连接该仓库。
-3. 整个工作区作为仓库时：
-   - 框架预设：无。
-   - 根目录：`website`。
-   - 构建命令：`npm run build`。
-   - 输出目录：`dist`。
-   - Node版本：22（可设置 `NODE_VERSION=22`）。
-4. 若 `website` 自身就是仓库根目录，则根目录留空，其余配置不变。
-5. 首次部署会获得 `https://项目名.pages.dev`，不必先买域名。
-6. 在生产环境添加 `SITE_URL=https://项目名.pages.dev`，重新部署。这样才会生成正式canonical和sitemap，并允许索引。预览分支不要设置这个生产变量。
-7. 若以后换域名，先在Pages绑定并验证域名，再更新 `SITE_URL`、重新部署，同时把旧生产域名重定向到新域名。
+正式网站：<https://laoge-ai-lab.laoge-lab.workers.dev/>。
 
-正式部署仍需用户账号授权。本地构建成功不等于已经公网发布。
+用户在Cloudflare网页创建的是Workers静态资源站点，首页和案例已可公开访问。维护现有 `laoge-ai-lab` Worker，无需为这次域名修改另建项目。
+
+- 生产分支：`main`。
+- 根目录：`website`。
+- 构建命令：`npm run build`。
+- 发布的静态资源：`dist`。
+- Node版本：22（可设置 `NODE_VERSION=22`）。
+
+正式地址已写在 `site.config.mjs`，可用 `SITE_URL` 环境变量覆盖。生产构建会输出canonical、sitemap、允许索引的robots及带正式地址的结构化数据。
+
+本地或远程预览使用 `npm run build:preview`，或设置构建变量 `SITE_PREVIEW=1`。预览构建禁止索引，并移除上一次生产构建的网站地图；不要在生产构建中开启该变量。
+
+如果以后绑定自有域名，先在现有Worker添加并验证域名，再更新 `SITE_URL` 并重新部署。Git推送后应查看Cloudflare构建结果，并检查公网内容是否已经更新。
 
 ### SEO与AI检索可读性
 
