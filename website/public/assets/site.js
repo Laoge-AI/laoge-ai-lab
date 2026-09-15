@@ -15,3 +15,30 @@ for (const button of document.querySelectorAll('[data-copy], [data-copy-from]'))
     }
   });
 }
+
+// Enhance the poster with an explicit play action. Without JavaScript, native controls remain usable.
+for (const player of document.querySelectorAll('.demo-player')) {
+  const video = player.querySelector('video');
+  const button = player.querySelector('.demo-play-button');
+  const error = player.querySelector('.demo-error');
+  if (!video || !button) continue;
+  video.controls = false;
+  button.hidden = false;
+  const showNativeControls = () => {
+    video.controls = true;
+    button.hidden = true;
+  };
+  video.addEventListener('play', showNativeControls);
+  button.addEventListener('click', async () => {
+    showNativeControls();
+    if (error) error.hidden = true;
+    try {
+      await video.play();
+    } catch {
+      if (error) {
+        error.textContent = '暂时无法开始播放，请使用播放器控件重试，或点击下方“单独打开视频”。';
+        error.hidden = false;
+      }
+    }
+  });
+}

@@ -24,7 +24,7 @@ for (const [file, html] of pageMap) {
   assert.equal(new Set(ids).size, ids.length, `${file}: duplicate IDs`);
   const schemas = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)];
   for (const match of schemas) assert.equal(JSON.parse(match[1])['@context'], 'https://schema.org');
-  for (const match of html.matchAll(/<(?:a|link|script|img)\b[^>]*?\b(?:href|src)="([^"]+)"/g)) {
+  for (const match of html.matchAll(/<(?:a|link|script|img|source|video)\b[^>]*?\b(?:href|src|poster)="([^"]+)"/g)) {
     const target = match[1];
     if (/^(?:https?:|mailto:|data:)/.test(target)) continue;
     const [path, anchor] = target.split('#');
@@ -84,7 +84,24 @@ try {
   const missing = await fetch(`${base}/does-not-exist/`);
   assert.equal(missing.status, 404);
   assert.match(await missing.text(), /这条路还没铺好/);
+  const mediaUrl = `${base}/media/customer-service-demo.mp4`;
+  const head = await fetch(mediaUrl, { method: 'HEAD' });
+  assert.equal(head.status, 200);
+  assert.equal(head.headers.get('content-type'), 'video/mp4');
+  const mediaSize = Number(head.headers.get('content-length'));
+  assert.ok(mediaSize > 0 && mediaSize < 25 * 1024 * 1024);
+  const firstBytes = await fetch(mediaUrl, { headers: { Range: 'bytes=0-31' } });
+  assert.equal(firstBytes.status, 206);
+  assert.equal(firstBytes.headers.get('content-range'), `bytes 0-31/${mediaSize}`);
+  assert.equal((await firstBytes.arrayBuffer()).byteLength, 32);
+  const suffix = await fetch(mediaUrl, { headers: { Range: 'bytes=-16' } });
+  assert.equal(suffix.status, 206);
+  assert.equal((await suffix.arrayBuffer()).byteLength, 16);
+  const invalid = await fetch(mediaUrl, { headers: { Range: `bytes=${mediaSize}-` } });
+  assert.equal(invalid.status, 416);
+  assert.equal(invalid.headers.get('content-range'), `bytes */${mediaSize}`);
   console.log('HTTP check passed: pages, assets and custom 404.');
+  console.log('Media check passed: MP4 MIME, HEAD, byte ranges and invalid-range response.');
 } finally {
   const stopped = once(server, 'exit');
   server.kill();

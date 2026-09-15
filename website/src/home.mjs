@@ -1,5 +1,6 @@
 import site from '../site.config.mjs';
 import { cases } from './cases.mjs';
+import { demoPlayer } from './demo.mjs';
 
 const escape = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 const arrow = '<span aria-hidden="true">↗</span>';
@@ -15,7 +16,7 @@ function introduction() {
       </div>
       <h1>帮小团队做<br><span>AI知识库、客服和官网</span></h1>
       <p class="v2-hero-description">先选一个实际问题，<strong>跑通一个小场景，再决定是否扩展。</strong><br>范围、费用、周期和验收方式，在动手前一起说清楚。</p>
-      <div class="v2-actions"><a class="button button-dark" href="#contact">微信聊一个需求 ${arrow}</a><a class="button v2-button-outline" href="#experiments">先看两个例子 <span aria-hidden="true">↓</span></a></div>
+      <div class="v2-actions"><a class="button button-dark" href="#contact">微信聊一个需求 ${arrow}</a><a class="button v2-button-outline" href="#customer-service-video">看客服录屏 <span aria-hidden="true">↓</span></a></div>
       <p class="v2-direct-email">也可以直接发邮件：<a href="${escape(mailLink())}">${escape(site.contact.email)}</a></p>
       <p class="v2-hero-note">适合已有业务资料、愿意先验证一个小环节的企业和个人。</p>
     </div>
@@ -39,7 +40,7 @@ function experience() {
 }
 
 function serviceEvidence() {
-  return `<div class="v2-example-visual v2-support-example"><div class="v2-example-label"><span>一个实际测过的问题</span><span>AI客服</span></div><div class="v2-customer-question"><span>模拟客户问</span><p>“我需要1000个65W的充电器，可以优惠吗？”</p></div><div class="v2-example-answer"><span class="v2-answer-icon" aria-hidden="true">↗</span><div><strong>把议价交给人工</strong><p>征得同意后，把联系方式和采购需求一起转交。人工的回复再返回原对话。</p></div></div><p class="v2-visual-caption">个人实验问答摘要，非真实客户对话截图。</p></div>`;
+  return `<div class="v2-example-visual v2-support-example v2-video-example" id="customer-service-video"><div class="v2-example-label"><span>看一次商品问答测试</span><span>约57秒录屏</span></div>${demoPlayer('home-customer-service-demo')}<p class="v2-visual-caption">本段展示问答与追问，回答仍需按业务资料核对。<a href="/experiments/ai-customer-service/#recording">查看录屏说明与已知问题</a></p></div>`;
 }
 
 function websiteEvidence() {
@@ -49,7 +50,7 @@ function websiteEvidence() {
 function examples() {
   return `<section id="experiments" class="v2-section shell">
     <div class="v2-heading"><div><p class="v2-section-label">先看已经做出来的东西</p><h2>这两类问题，我做过验证。</h2></div><p>个人实验与自用案例。<br>真实业务需要一起评估。</p></div>
-    <div class="v2-examples-grid">${cases.map(item => `<article class="v2-example">
+    <div class="v2-examples-grid v2-examples-grid--media">${cases.map(item => `<article class="v2-example">
       ${item.number === '002' ? serviceEvidence() : websiteEvidence()}
       <div class="v2-example-copy"><p class="v2-example-kind">${item.number === '002' ? '个人实验 · 已验证问答与人工接手' : '模拟项目 + 本站自用 · 已完成验证'}</p>
       <h3><a href="/experiments/${item.slug}/">${item.homeTitle}</a></h3><p class="v2-example-problem">${item.homeProblem}</p>

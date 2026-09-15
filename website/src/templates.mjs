@@ -1,5 +1,6 @@
 import site from '../site.config.mjs';
 import { homeContent } from './home.mjs';
+import { demoPlayer, demoNotes } from './demo.mjs';
 
 export const escape = value => String(value).replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[char]));
 const arrow = '<span aria-hidden="true">↗</span>';
@@ -52,6 +53,10 @@ export function home(origin) {
 }
 
 function serviceBody() {
+  return `<section class="article-section demo-section" id="recording"><h2>先看约57秒实际测试录屏</h2><p>这段录屏展示商品资料问答与连续追问。画面裁掉了会话列表和窗口边框，保留提供片段的顺序与时长。</p>${demoPlayer('case-customer-service-demo')}${demoNotes()}</section>${serviceRecordBody()}`;
+}
+
+function serviceRecordBody() {
   return `<section class="article-section"><h2>先回答常见问题，再把需要判断的事交给人</h2><p>我选择虚拟数码店铺作为实验场景，整理商品、物流、售后政策和常见问题资料。目的很具体：验证自动问答和人工处理能不能接成一条完整流程。</p><p>这个实验面向电商和小微企业里重复处理简单咨询的场景，但目前没有接入真实电商客服渠道。</p><div class="article-flow"><span>用户在飞书提问</span><b aria-hidden="true">↓</b><span>FastAPI连接Dify工作流</span><b aria-hidden="true">↓</b><span>查询知识库 / 判断处理路径</span><b aria-hidden="true">↓</b><span>有依据地回答，或带上下文转人工</span><b aria-hidden="true">↓</b><span>通过机器人向用户回传回复</span></div><p class="caption">根据现有实验记录整理的逻辑流程，不是部署架构图。GLM用于提示词辅助，Dify负责知识库和工作流编排。</p></section>
   <section class="article-section"><h2>一个跑通的测试：批量采购怎么处理？</h2><blockquote><p>“我需要1000个65W的充电器，可以优惠吗？”</p><cite>实验测试输入</cite></blockquote><p>系统先征求用户是否同意提供联系方式。同意后，将联系方式和采购需求转给人工客服，而不是由AI自行决定折扣。</p><div class="finding"><span>测试结果</span><p>符合本次预期。人工介入后，用户不必重新描述问题；人工的回复也能正常反馈给用户。</p></div></section>
   <section class="article-section"><h2>一次踩坑：回复像客服，却加了不存在的规则</h2><p>退款赔偿测试中，机器人虽然识别出了需要人工处理，却向客户额外索要知识库没有规定的发票材料。收紧提示词后再测，又出现了额外要求联系方式的情况。</p><p>这两次测试让我意识到：语气合理，不代表符合这家店的业务规则。根据已整理的实验记录，后来将这类回复改为程序规则处理，使用固定话术、创建工单并通知人工支持群。人工接手期间暂停AI自动回复，人工回复再回传原对话。</p><div class="finding finding-yellow"><span>我的判断</span><p>需要确定性的业务环节，不能只依赖模型临场发挥。把规则、工单和人工接管接起来，才能检查整条处理流程。</p></div><figure class="evidence"><a href="/images/customer-service-test.png" target="_blank" rel="noopener"><img src="/images/customer-service-test.png" alt="退款测试记录摘要：AI首次额外要求发票，收紧提示词后又增加联系方式，均需核对店铺规则" width="1080" height="1440" loading="lazy"></a><figcaption>已有实验图文中的测试记录摘要，非原始聊天截图。点击可看大图。</figcaption></figure></section>

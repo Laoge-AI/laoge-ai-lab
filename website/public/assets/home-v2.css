@@ -124,6 +124,28 @@
 .v2-updates-inner div > a { display: inline-block; font-size: 11px; margin-right: 20px; border-bottom: 1px solid #a8b38c; }
 .evidence--website img { aspect-ratio: 36/25; max-width: none; }
 
+/* Real recording: no autoplay; preload="none" requests on-demand media loading. */
+.v2-examples-grid--media .v2-example-visual { height: auto; }
+.v2-examples-grid--media .v2-site-screenshot img { aspect-ratio: 1408/966; object-position: top; }
+.demo-player { margin-top: 15px; }
+.demo-video-shell { position: relative; }
+.demo-player video { display: block; width: 100%; height: auto; aspect-ratio: 1408/966; background: #20231d; border-radius: 5px; border: 1px solid #d5dcc9; }
+.demo-play-button { position: absolute; inset: 0; width: 100%; border: 0; border-radius: 5px; background: #20231d24; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 13px; }
+.demo-play-button[hidden] { display: none; }
+.demo-play-icon { display: grid; place-items: center; width: 56px; height: 56px; border-radius: 50%; background: #242820; color: #edef59; font-size: 24px; padding-left: 3px; box-shadow: 0 2px 16px #0003; }
+.demo-play-button > span:last-child { background: #242820; color: #fffef9; font-size: 12px; padding: 5px 13px; border-radius: 20px; }
+.demo-play-button:hover .demo-play-icon { background: #465137; }
+.demo-error { color: #87442b; font-size: 12px; line-height: 1.8; margin-top: 8px; }
+.demo-caption { color: #58624f; font-size: 11px; line-height: 1.8; margin-top: 10px; }
+.demo-file-link { display: inline-block; color: #435834; font-size: 11px; border-bottom: 1px solid #a5b395; margin-top: 5px; }
+.v2-video-example .v2-visual-caption { font-size: 11px; line-height: 1.8; }
+.v2-video-example .v2-visual-caption a { text-decoration: underline; text-underline-offset: 3px; }
+.demo-notes { margin-block: 18px 26px; border-top: 1px solid var(--line); }
+.demo-notes ol { padding-left: 22px; font-size: 13px; color: #555f4a; line-height: 1.95; }
+.demo-notes li { padding-left: 3px; margin-bottom: 9px; }
+.demo-notes p { font-size: 13px; }
+.demo-section .demo-caption { font-size: 12px; }
+
 /* Enlarge the QR region of the supplied portrait image; clicking still opens the untouched original. */
 .v2-wechat > a { position: relative; aspect-ratio: 1; }
 .v2-wechat > a > img { position: absolute; width: 137%; max-width: none; height: auto; left: -18.5%; top: -58%; }

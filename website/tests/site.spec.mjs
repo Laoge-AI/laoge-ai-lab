@@ -73,6 +73,34 @@ test('FAQ支持键盘操作，未知路径返回真实404', async ({ page }) => 
   await expect(page).toHaveURL('/');
 });
 
+test('真实录屏可按需播放、暂停和跳转，详情提供文字说明', async ({ page, request }) => {
+  await page.goto('/');
+  await page.getByRole('link', { name: '看客服录屏', exact: false }).click();
+  await expect(page).toHaveURL(/\/#customer-service-video$/);
+  const video = page.locator('#home-customer-service-demo');
+  await expect(video).toBeInViewport();
+  expect(await video.evaluate(element => element.paused)).toBe(true);
+  await expect(video).toHaveAttribute('preload', 'none');
+  await page.getByRole('button', { name: '播放AI客服测试录屏', exact: true }).click();
+  await expect.poll(() => video.evaluate(element => element.currentTime)).toBeGreaterThan(0.2);
+  const metadata = await video.evaluate(element => ({ duration: element.duration, width: element.videoWidth, height: element.videoHeight }));
+  expect(metadata.duration).toBeGreaterThan(56);
+  expect(metadata.duration).toBeLessThan(58);
+  expect(metadata.width).toBe(1408);
+  expect(metadata.height).toBe(966);
+  await video.evaluate(element => { element.currentTime = 40; });
+  await expect.poll(() => video.evaluate(element => !element.seeking && element.currentTime >= 40 && element.readyState >= 2)).toBe(true);
+  await video.evaluate(element => element.pause());
+  expect(await video.evaluate(element => element.paused)).toBe(true);
+  const range = await request.get('/media/customer-service-demo.mp4', { headers: { Range: 'bytes=0-31' } });
+  expect(range.status()).toBe(206);
+  expect((await range.body()).length).toBe(32);
+  await page.goto('/experiments/ai-customer-service/#recording');
+  await page.locator('.demo-notes summary').click();
+  await expect(page.locator('.demo-notes')).toContainText('没有重新录制人工回复回传的完整操作');
+  await expect(page.locator('.demo-notes')).toContainText('重复与数量表述不一致');
+});
+
 test('保存第二版桌面与手机预览截图', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto('/');
