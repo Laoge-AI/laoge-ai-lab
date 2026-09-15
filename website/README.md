@@ -1,6 +1,6 @@
 # 老鸽的AI落地实验室
 
-暖白、墨黑与少量黄色强调的静态个人案例站。第一版包含首页、AI客服案例、AI建站案例和404页。页面在构建时生成完整HTML，无运行时框架、第三方字体或数据库依赖。
+暖白、墨黑与少量黄色强调的静态个人服务与案例站。第二版根据读者反馈重排首页：先讲身份与能解决的问题，再展示验证记录、合作步骤及直接联系方式。页面在构建时生成完整HTML，无运行时框架、第三方字体或数据库依赖。
 
 ## 本地预览
 
@@ -21,23 +21,23 @@ npm ci
 npm run test:browser
 ```
 
-Windows默认使用系统Edge，其他环境使用Playwright Chromium（必要时先执行 `npx playwright install chromium`）。可通过 `PLAYWRIGHT_CHANNEL` 覆盖浏览器通道。测试覆盖320/390/768/1440px布局、案例导航、复制需求、FAQ键盘操作和404，并在 `artifacts/` 保存桌面与手机截图。Playwright仅为开发依赖，不会进入公开网站。
+Windows默认使用系统Edge，其他环境使用Playwright Chromium（必要时先执行 `npx playwright install chromium`）。可通过 `PLAYWRIGHT_CHANNEL` 覆盖浏览器通道。测试覆盖320/390/768/1440px布局、案例导航、复制需求和邮箱、打开个人微信二维码、FAQ键盘操作及404。第二版截图保存到 `artifacts/v2/`，第一版截图保留用于对比。Playwright仅为开发依赖，不会进入公开网站。
 
 ## 发布前补充
 
 在 `site.config.mjs` 修改：
 
 - `contact.wechat`：公开微信号；和二维码可二选一。
-- `contact.qrImage`：例如 `/images/wechat-qr.png`，文件放在 `public/images/`。
+- `contact.qrImage`：已接入个人微信二维码 `/images/wechat-qr.jpg`。
 - `contact.officialAccountQr`：已接入公众号关注二维码，与个人微信二维码分开维护。
 - `avatar`：已接入小红书头像 `/images/avatar.jpg`。
-- `contact.email`：公开邮箱，可选。
+- `contact.email`：用户确认公开的联系邮箱。
 - `contact.xiaohongshu`：目前是实验001笔记；有个人主页链接后替换，并修改对应标签。
 - `contact.github`：已链接本网站的公开GitHub仓库。
 
-当前以已知小红书笔记作为需求交流入口；公众号二维码用于关注更新，不冒充个人微信联系入口。需求描述框仅在浏览器内填写和复制，不提交、不保存。
+当前直接展示个人微信二维码与联系邮箱。公众号收纳在可展开的“关注实验更新”区域，作为内容订阅入口。需求描述框仅在浏览器内填写和复制，不提交、不保存。
 
-`src/cases.mjs` 存放案例概况，`src/templates.mjs` 存放页面文案和结构，`public/assets/styles.css` 控制设计。
+`src/home.mjs` 存放第二版首页，`src/cases.mjs` 存放案例概况，`src/templates.mjs` 存放共享页面骨架和案例详情。`public/assets/home-v2.css` 为第二版布局，原 `styles.css` 继续提供通用与文章样式。
 
 ## 公开素材
 
@@ -45,6 +45,8 @@ Windows默认使用系统Edge，其他环境使用Playwright Chromium（必要�
 
 - `avatar.jpg`：用户提供的小红书头像。
 - `official-account-qr.jpg`：用户提供的公众号关注二维码，保留原图。
+- `wechat-qr.jpg`：用户提供的个人微信二维码，保留原图，可点击打开。
+- `homepage-v1.png`：本站第一版实际首屏截图，作为自用案例的证据。
 - `customer-service-setup.png`：已审阅的实验搭建记录摘要。
 - `customer-service-test.png`：已审阅的退款测试记录摘要。
 
@@ -95,8 +97,12 @@ Pages初次对照测试使用 `npm run build:preview`。转为正式入口时，
 - 客服逻辑流按资料整理为：飞书入口 → FastAPI → Dify知识库/工作流 → 回复或人工处理 → 原对话回传。发布前请确认与现有架构一致。
 - 退款补充材料与批量采购联系信息是不同业务场景，详情页分开叙述。
 - 官网案例仅确认本地运行和图片上传状态问题修复，不使用早期图文里未经再次核对的速度、费用和Bug数量。
-- 小红书头像和公众号二维码已接入。个人微信号或二维码、客服笔记URL、建站截图和公开源码链接仍可补充。
+- 小红书头像、公众号及个人微信二维码、邮箱已接入。模拟企业官网的原始截图、客服笔记URL与对应源码链接仍可补充。
+- 工作经历只做通信等领域系统项目交付的概括，不能把以往IT交付经历写成AI客户商业成果。
+- 合作方式采用用户确认的“按范围评估后报价”，金额、周期、验收、维护及未达标处理方式在具体项目启动前约定。
 
 ## 这次实验的记录
 
 请使用 `CONTENT-NOTES.md` 记录第一版截图、改动理由、读者反馈和实际耗时。终稿与封面应在确认结果后制作。
+
+本轮改版决策与后续验证问题见 `REVISION-02.md`。

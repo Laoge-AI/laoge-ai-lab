@@ -1,5 +1,6 @@
 // 一次性把选定的二进制素材导入网站。公开构建不运行此脚本，也不依赖原始路径。
 // 使用方式：node scripts/import-assets.mjs --avatar "...jpg" --official-account-qr "...jpg" --evidence
+// 可追加 --wechat-qr "...jpg" 与 --homepage-screenshot "...png" 导入个人联系码和本站截图。
 import { cp, mkdir, readFile } from 'node:fs/promises';
 import { createHash } from 'node:crypto';
 import { dirname, join, resolve } from 'node:path';
@@ -9,12 +10,16 @@ import { parseArgs } from 'node:util';
 const { values } = parseArgs({ options: {
   avatar: { type: 'string' },
   'official-account-qr': { type: 'string' },
+  'wechat-qr': { type: 'string' },
+  'homepage-screenshot': { type: 'string' },
   evidence: { type: 'boolean', default: false },
 } });
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const assets = [];
 if (values.avatar) assets.push([resolve(values.avatar), 'avatar.jpg', 'jpeg']);
 if (values['official-account-qr']) assets.push([resolve(values['official-account-qr']), 'official-account-qr.jpg', 'jpeg']);
+if (values['wechat-qr']) assets.push([resolve(values['wechat-qr']), 'wechat-qr.jpg', 'jpeg']);
+if (values['homepage-screenshot']) assets.push([resolve(values['homepage-screenshot']), 'homepage-v1.png', 'png']);
 if (values.evidence) {
   const source = resolve(root, '../deliverables/experiment-002/首次实验版');
   assets.push([join(source, '02_这次搭了什么.png'), 'customer-service-setup.png', 'png']);
